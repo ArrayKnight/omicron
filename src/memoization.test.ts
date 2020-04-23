@@ -18,6 +18,7 @@ describe('createKey', () => {
 })
 
 describe('memoization', () => {
+    const id = 'c544d3ae-a72d-4755-8ce5-d25db415b776'
     let now = 0
 
     jest.spyOn(Date, 'now').mockImplementation(() => now)
@@ -27,15 +28,13 @@ describe('memoization', () => {
     })
 
     it('should memoize function result', () => {
-        let returnValue = 5
+        let value = 5
         const timeout = 1000
-        const id = 'c544d3ae-a72d-4755-8ce5-d25db415b776'
-        const testFunction = (): number => returnValue
-        const memoized = memoize(testFunction, undefined, timeout)
+        const memoized = memoize(() => value, undefined, timeout)
 
         expect(memoized(id)).toEqual(5)
 
-        returnValue = 10
+        value = 10
 
         expect(memoized(id)).toEqual(5)
 
@@ -48,5 +47,15 @@ describe('memoization', () => {
         now += timeout
 
         expect(memoized(id)).toEqual(10)
+    })
+
+    it('should create memoized functions with unique caches', () => {
+        const valueOne = 'foo'
+        const memoizedOne = memoize(() => valueOne)
+        const valueTwo = 'bar'
+        const memoizedTwo = memoize(() => valueTwo)
+
+        expect(memoizedOne(id)).toEqual(valueOne)
+        expect(memoizedTwo(id)).toEqual(valueTwo)
     })
 })

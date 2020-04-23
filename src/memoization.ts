@@ -62,6 +62,7 @@ export function memoize(
 
 export function createKey(value: unknown): string {
     try {
+        // Be sure to convert undefined to string
         return `${JSON.stringify(value)}`
     } catch {
         return `${value}`
