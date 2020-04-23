@@ -58,4 +58,29 @@ describe('memoization', () => {
         expect(memoizedOne(id)).toEqual(valueOne)
         expect(memoizedTwo(id)).toEqual(valueTwo)
     })
+
+    it('should only call function if timeout has expired', () => {
+        const funcOne = jest.fn()
+        const memoizedOne = memoize(funcOne)
+        const funcTwo = jest.fn()
+        const timeout = 1000
+        const memoizedTwo = memoize(funcTwo, undefined, timeout)
+        const assertions = [
+            { ms: 0, funcOneTimes: 0, funcTwoTimes: 0 },
+            { ms: timeout, funcOneTimes: 1, funcTwoTimes: 1 },
+            { ms: timeout / 2, funcOneTimes: 1, funcTwoTimes: 2 },
+            { ms: timeout, funcOneTimes: 1, funcTwoTimes: 2 },
+            { ms: 0, funcOneTimes: 1, funcTwoTimes: 3 },
+        ]
+
+        assertions.forEach(({ ms, funcOneTimes, funcTwoTimes }) => {
+            expect(funcOne).toHaveBeenCalledTimes(funcOneTimes)
+            expect(funcTwo).toHaveBeenCalledTimes(funcTwoTimes)
+
+            now += ms
+
+            memoizedOne()
+            memoizedTwo()
+        })
+    })
 })
