@@ -26,13 +26,44 @@
  * @param timeout   timeout for cached values in milliseconds
  */
 
+interface Dictionary<T = unknown> {
+    [key: string]: T
+}
+
+interface CacheEntry {
+    result: unknown
+    timestamp: number
+}
+
 export function memoize(
     func: (...args: unknown[]) => unknown,
     resolver: (...args: unknown[]) => unknown = (...args) => args,
     timeout = 0,
 ): (...args: unknown[]) => unknown {
-    // TODO implement the memoize function
-    console.log({ func, resolver, timeout })
+    const cache: Dictionary<CacheEntry> = {}
 
-    return func
+    return (...args) => {
+        const key = getKey(resolver(...args))
+        const useCached =
+            Object.prototype.hasOwnProperty.call(cache, key) &&
+            Date.now() - cache[key].timestamp < timeout
+        const result = useCached ? cache[key].result : func(...args)
+
+        if (!useCached) {
+            cache[key] = {
+                result,
+                timestamp: timeout > 0 ? Date.now() : Infinity,
+            }
+        }
+
+        return result
+    }
+}
+
+export function getKey(value: unknown): string {
+    try {
+        return JSON.stringify(value)
+    } catch {
+        return `${value}`
+    }
 }
