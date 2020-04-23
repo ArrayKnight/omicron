@@ -5,7 +5,7 @@ describe('createKey', () => {
         expect(createKey(null)).toEqual('null')
         expect(createKey(undefined)).toEqual('undefined')
         expect(createKey(13)).toEqual('13')
-        expect(createKey('foo-bar')).toEqual('"foo-bar"')
+        expect(createKey('foo-bar')).toEqual('foo-bar')
         expect(createKey([13, 'foo', 'bar'])).toEqual('[13,"foo","bar"]')
         expect(createKey({ foo: 'bar' })).toEqual('{"foo":"bar"}')
         expect(createKey([{ foo: 'bar' }, { bar: 'foo' }])).toEqual(

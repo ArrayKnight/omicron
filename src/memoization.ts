@@ -61,6 +61,10 @@ export function memoize(
 }
 
 export function createKey(value: unknown): string {
+    if (typeof value === 'string') {
+        return value
+    }
+
     try {
         // Be sure to convert undefined to string
         return `${JSON.stringify(value)}`
