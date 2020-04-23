@@ -40,15 +40,24 @@ export function memoize(
     resolver: (...args: unknown[]) => unknown = (...args) => args,
     timeout = 0,
 ): (...args: unknown[]) => unknown {
+    // Create a unique cache for this instance of the function
     const cache: Dictionary<CacheEntry> = {}
 
     return (...args) => {
+        // Convert args into a string key, identical args should create the same key
+        // There are rare edge cases where args that are technically the same could create a different key, ex:
+        // [{foo: 'foo', bar: 'bar'}] !== [{bar: 'bar', foo: 'foo'}] but skip this edge case (for now) for simplicity
         const key = createKey(resolver(...args))
+        // Rather than create potentially long running timers that delete cache entries a timestamp is stored
+        // along with the previous result as the cache entry. This has the potential of eating up more memory
+        // in the long run, though having a bunch of concurrent timers does the same.
         const useCached =
             Object.prototype.hasOwnProperty.call(cache, key) &&
             Date.now() - cache[key].timestamp < timeout
+        // If the cached result hasn't expired use it, otherwise get a new result
         const result = useCached ? cache[key].result : func(...args)
 
+        // (Re)set the cache entry with the most recent result + timestamp
         if (!useCached) {
             cache[key] = {
                 result,
