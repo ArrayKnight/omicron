@@ -43,7 +43,7 @@ export function memoize(
     const cache: Dictionary<CacheEntry> = {}
 
     return (...args) => {
-        const key = getKey(resolver(...args))
+        const key = createKey(resolver(...args))
         const useCached =
             Object.prototype.hasOwnProperty.call(cache, key) &&
             Date.now() - cache[key].timestamp < timeout
@@ -60,9 +60,9 @@ export function memoize(
     }
 }
 
-export function getKey(value: unknown): string {
+export function createKey(value: unknown): string {
     try {
-        return JSON.stringify(value)
+        return `${JSON.stringify(value)}`
     } catch {
         return `${value}`
     }
