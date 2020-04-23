@@ -77,10 +77,24 @@ describe('memoization', () => {
             expect(funcOne).toHaveBeenCalledTimes(funcOneTimes)
             expect(funcTwo).toHaveBeenCalledTimes(funcTwoTimes)
 
+            // Move forward in time
             now += ms
 
             memoizedOne()
             memoizedTwo()
         })
+    })
+
+    it('should allow resolver to determine cache key', () => {
+        const foo = 'foo'
+        const bar = 'bar'
+        const memoized = memoize(
+            (i: number) => (i % 2 === 0 ? foo : bar),
+            (i: number) => (i % 2 === 0 ? foo : bar),
+        )
+
+        for (let i = 0; i < 10; i++) {
+            expect(memoized(i)).toEqual(i % 2 === 0 ? foo : bar)
+        }
     })
 })
